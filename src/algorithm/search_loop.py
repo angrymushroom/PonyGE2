@@ -33,8 +33,15 @@ def search_loop():
     for generation in range(1, (params['GENERATIONS']+1)):
         stats['gen'] = generation
 
+        # Botao
+        print('Generation ',generation, ' is generated')
+
         # New generation
+        # Call step.py
         individuals = params['STEP'](individuals)
+        print('New individual"s genome :')
+        print(individuals.genome)
+        print('Individuals are shown\n')
 
     if params['MULTICORE']:
         # Close the workers pool (otherwise they'll live on forever).

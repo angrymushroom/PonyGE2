@@ -39,6 +39,9 @@ def tournament(population):
         # Randomly choose TOURNAMENT_SIZE competitors from the given
         # population. Allows for re-sampling of individuals.
         competitors = sample(available, params['TOURNAMENT_SIZE'])
+        print('\n--------Print competitors:---------')
+        print(*competitors)
+        print('--------Competitors are printed--------\n')
 
         # Return the single best competitor.
         winners.append(max(competitors))

@@ -27,11 +27,13 @@ def initialisation(size):
     # the limit.
     size -= len(params['SEED_INDIVIDUALS'])
 
-    # Initialise empty population.
+
+    # Initialise empty population. 'INITIALISATION': "operators.initialisation.PI_grow"
     individuals = params['INITIALISATION'](size)
 
     # Add seed individuals (if any) to current population.
     individuals.extend(params['SEED_INDIVIDUALS'])
+
 
     return individuals
     

@@ -93,6 +93,11 @@ def get_soo_stats(individuals, end):
         # Save best individual in trackers.best_ever.
         trackers.best_ever = best
 
+        # Botao
+        print('Best individual:')
+        print(trackers.best_ever)
+        print('Best individual updated')
+
     if end or params['VERBOSE'] or not params['DEBUG']:
         # Update all stats.
         update_stats(individuals, end)

@@ -6,7 +6,7 @@ DATASET_TRAIN:          Banknote/Train.csv
 DATASET_TEST:           Banknote/Test.csv
 DEBUG:                  False
 ERROR_METRIC:           f1_score
-GENERATIONS:            50
+GENERATIONS:            10
 MAX_GENOME_LENGTH:      500
 GRAMMAR_FILE:           supervised_learning/Banknote.bnf
 INITIALISATION:         PI_grow
