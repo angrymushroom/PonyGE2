@@ -39,8 +39,10 @@ def search_loop():
         # New generation
         # Call step.py
         individuals = params['STEP'](individuals)
-        print('New individual"s genome :')
-        print(individuals.genome)
+        print('\nGenome in individual:')
+        for i in individuals:
+            print('Individual:',i)
+            print('Genome:',i.genome)
         print('Individuals are shown\n')
 
     if params['MULTICORE']:

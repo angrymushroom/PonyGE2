@@ -27,13 +27,16 @@ def initialisation(size):
     # the limit.
     size -= len(params['SEED_INDIVIDUALS'])
 
-
-    # Initialise empty population. 'INITIALISATION': "operators.initialisation.PI_grow"
+    # Initialise empty population.
+    # 'INITIALISATION': "operators.initialisation.PI_grow"
     individuals = params['INITIALISATION'](size)
+    print('\nInitialization Individual:')
+    for i in individuals:
+        print(i, 'Genome in the individuals: ', i.genome)
+    print('Initial individuals are shown')
 
     # Add seed individuals (if any) to current population.
     individuals.extend(params['SEED_INDIVIDUALS'])
-
 
     return individuals
     
@@ -46,6 +49,7 @@ def sample_genome():
     """
     genome = [randint(0, params['CODON_SIZE']) for _ in
               range(params['INIT_GENOME_LENGTH'])]
+    print('\nSample genome is generated: ', genome)
     return genome
 
 
@@ -271,6 +275,11 @@ def PI_grow(size):
             # Append individual to population
             population.append(ind)
 
+        print('\nPopulation in PI_grow:')
+        for i in population:
+            print(i)
+            print(i.genome)
+        print('Population is shown')
         return population
 
 

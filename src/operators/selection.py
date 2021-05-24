@@ -38,9 +38,17 @@ def tournament(population):
     while len(winners) < params['GENERATION_SIZE']:
         # Randomly choose TOURNAMENT_SIZE competitors from the given
         # population. Allows for re-sampling of individuals.
-        competitors = sample(available, params['TOURNAMENT_SIZE'])
-        print('\n--------Print competitors:---------')
+        print('Print available: ', *available)
+        # competitors = sample(available, params['TOURNAMENT_SIZE'])
+        print('\nFinding two competitors:')
+        competitors = two_max_genome_length(available,2)
+        print('Two competitors are found\n')
+        print('Print elements')
         print(*competitors)
+        print('\n--------Print competitors:---------')
+        for i, j in enumerate(competitors):
+            print('Competitor ', i, ' is ', j)
+            print(j.genome)
         print('--------Competitors are printed--------\n')
 
         # Return the single best competitor.
@@ -133,3 +141,23 @@ def pareto_tournament(population, pareto, tournament_size):
 
 # Set attributes for all operators to define multi-objective operators.
 nsga2_selection.multi_objective = True
+
+
+def two_max_genome_length(available_origin, N):
+    final_list = []
+    print('Print available: ', *available_origin)
+    available = available_origin.copy()
+
+    for i in range(0, N):
+        # max1 = 0
+        longest_length_individual = [0,0] # (length, individual)
+
+        for j in range(len(available)):
+            if len(available[j].genome) > longest_length_individual[0]:
+                longest_length_individual[0] = len(available[j].genome)
+                longest_length_individual[1] = available[j]
+
+        available.remove(longest_length_individual[1])
+        final_list.append(longest_length_individual[1])
+
+    return final_list

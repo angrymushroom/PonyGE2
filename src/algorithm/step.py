@@ -20,6 +20,9 @@ def step(individuals):
 
     # Select parents from the original population.
     parents = selection(individuals)
+    print('\nParents :')
+    print(*parents)
+    print('Parents are shown')
 
     # Crossover parents and add to the new population.
     cross_pop = crossover(parents)
