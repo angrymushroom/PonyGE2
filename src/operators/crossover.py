@@ -1,9 +1,13 @@
 from random import randint, random, sample, choice
+from typing import List, Any, Tuple, Union
 
 from algorithm.parameters import params
 from representation import individual
 from representation.latent_tree import latent_tree_crossover, latent_tree_repair
 from utilities.representation.check_methods import check_ind
+from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
+import math
 
 
 def crossover(parents):
@@ -34,7 +38,123 @@ def crossover(parents):
             pass
         
         else:
-                        
+            # Extend the new population.
+            cross_pop.extend(inds_out)
+
+    return cross_pop
+
+
+def crossover_between_clusters(parents):
+    """
+    Perform crossover on a population of individuals. Cluster parents into k
+    clusters then select two parents from two different clusters to do the crossover.
+
+    :param parents: A population of parent individuals on which crossover is to
+    be performed.
+    :return: A population of fully crossed over individuals.
+    """
+
+    # Initialise an empty population.
+    cross_pop = []
+    # cluster the population into k clusters. set k in sub_population().
+    sub_list = sub_population(parents)  # cluster the population into k clusters. set k in sub_population
+
+    while len(cross_pop) < params['GENERATION_SIZE']:
+
+        cluster_list = sample(sub_list, 2)  # randomly select two clusters
+
+        # select one individual as a parent from each clusters
+        ind_1, ind_2 = sample(cluster_list[0], 1), sample(cluster_list[1], 1)
+
+        # Perform crossover on chosen parents.
+        inds_out = crossover_inds(ind_1[0], ind_2[0])
+
+        if inds_out is None:
+            # Crossover failed.
+            pass
+        else:
+            # Extend the new population.
+            cross_pop.extend(inds_out)
+
+    return cross_pop
+
+
+def crossover_between_clusters_elitism(parents):
+    """
+    Perform crossover on a population of individuals.
+    Cluster parents into k clusters then select two parents from two different clusters to do the crossover.
+
+    Identify a elite cluster which has the highest mean fitness and always select one individual from it to do the
+    crossover. Randomly select another individual from an another arbitrary clusters.
+
+    :param parents: A population of parent individuals on which crossover is to be performed.
+    :return: A population of fully crossed over individuals.
+    """
+
+    # Initialise an empty population.
+    cross_pop = []
+
+    # Cluster the population into k clusters. set k in sub_population().
+    sub_list = sub_population(parents)  # a list contains sub populations lists
+
+    elite_population, average_population = elite_cluster(sub_list)
+
+    while len(cross_pop) < params['GENERATION_SIZE']:
+        # Biased randomized selection. select the better individual in elite_population
+        # ind_1 = brp_selection(elite_population)
+
+        ind_1 = sample(elite_population, 1)
+
+        # Randomly select another individual from an arbitrary average population.
+        selected_average_population = sample(average_population, 1)
+        ind_2 = sample(selected_average_population[0], 1)
+
+        # Perform crossover on chosen parents.
+        inds_out = crossover_inds(ind_1, ind_2[0])
+
+        if inds_out is None:
+            # Crossover failed.
+            pass
+        else:
+            # Extend the new population.
+            cross_pop.extend(inds_out)
+
+    return cross_pop
+
+
+def crossover_in_same_cluster(parents):
+    """
+    Perform crossover on a population of individuals. Cluster parents into k
+    clusters then select two parents from one cluster to do the crossover.
+
+    :param parents: A population of parent individuals on which crossover is to
+    be performed.
+    :return: A population of fully crossed over individuals.
+    """
+
+    # Initialise an empty population.
+    cross_pop = []
+    # cluster the population into k clusters. set k in sub_population().
+    sub_list = sub_population(parents)  # cluster the population into k clusters. set k in sub_population
+
+    while len(cross_pop) < params['GENERATION_SIZE']:
+
+        cluster_list = sample(sub_list, 1)  # randomly select one clusters
+
+        # Select another cluster if the cluster size less than 2
+        while len(cluster_list[0]) < 2:
+            cluster_list = sample(sub_list, 1)
+
+        # select one individual as a parent from each clusters
+        ind_1, ind_2 = sample(cluster_list[0], 2)
+
+        # Perform crossover on chosen parents.
+        inds_out = crossover_inds(ind_1, ind_2)
+
+        if inds_out is None:
+            # Crossover failed.
+            pass
+        else:
             # Extend the new population.
             cross_pop.extend(inds_out)
 
@@ -111,6 +231,11 @@ def variable_onepoint(p_0, p_1):
     ind_0 = individual.Individual(c_0, None)
     ind_1 = individual.Individual(c_1, None)
 
+    """print('----PRINT OFFSPRINGS----')
+    print(ind_0, ind_1)
+    print('----OFFSPRINGS GENOME----')
+    print(ind_0.genome, ind_1.genome)"""
+
     return [ind_0, ind_1]
 
 
@@ -126,7 +251,7 @@ def fixed_onepoint(p_0, p_1):
     :param p_1: Parent 1
     :return: A list of crossed-over individuals.
     """
-    
+
     # Get the chromosomes.
     genome_0, genome_1 = p_0.genome, p_1.genome
 
@@ -146,7 +271,7 @@ def fixed_onepoint(p_0, p_1):
     # Put the new chromosomes into new individuals.
     ind_0 = individual.Individual(c_0, None)
     ind_1 = individual.Individual(c_1, None)
-    
+
     return [ind_0, ind_1]
 
 
@@ -162,7 +287,7 @@ def fixed_twopoint(p_0, p_1):
     :param p_1: Parent 1
     :return: A list of crossed-over individuals.
     """
-    
+
     genome_0, genome_1 = p_0.genome, p_1.genome
 
     # Uniformly generate crossover points.
@@ -461,6 +586,78 @@ def LTGE_crossover(p_0, p_1):
     ind_1.invalid = False
    
     return [ind_0, ind_1]
+
+
+def sub_population(population, n_clusters=9):
+    """
+    Divide the population into k clusters.
+    """
+    # df = [[i.fitness, len(i.genome), i.nodes, i.depth, i.used_codons] for i in population]
+    # TO DO: normalization
+    df = [[len(i.genome), i.nodes, i.depth, i.used_codons] for i in population]
+
+    cluster_number = n_clusters
+
+    hc = AgglomerativeClustering(n_clusters=cluster_number, affinity='euclidean', linkage='ward')
+
+    # kmeansmodel = KMeans(n_clusters=5, init='k-means++', random_state=0)
+    y_hat = hc.fit_predict(df)
+    individuals_with_labels = zip(population, y_hat)
+    individuals_with_labels = list(individuals_with_labels)
+
+    sub_list = [[] for i in range(cluster_number)]
+
+    for i in individuals_with_labels:
+        cluster_index = i[1]
+        sub_list[cluster_index].append(i[0])
+
+    return sub_list
+
+
+def elite_cluster(sub_list):
+    """
+    Divide a list of sub-population into a elite population and some average populations.
+
+    :param sub_list: a list of population clusters
+    :return:
+    """
+
+    elite_population = None
+    average_population = None
+
+    # Initialise a list to contain the fitness mean.
+    fitness_mean_list = [0 for i in range(len(sub_list))]  # initialise a list to contain the fitness mean.
+
+    # Calculate the mean of fitness for each sub-population.
+    for i in range(len(sub_list)):
+        fitness_mean_list[i] = 0
+        for j in sub_list[i]:
+            fitness_mean_list[i] += j.fitness
+        fitness_mean_list[i] /= len(sub_list[i])
+
+    # Select the population with the highest fitness mean as elite population.
+    # The left populations are the average population.
+    for i in range(len(fitness_mean_list)):
+        if fitness_mean_list[i] == max(fitness_mean_list):
+            elite_population = sub_list.pop(i)
+            average_population = sub_list
+
+    return elite_population, average_population
+
+
+def brp_selection(elite_population, beta=0.7):
+    """
+    Use biased randomized algorithm to select one parent from elite population.
+    Biased randomized algorithm: sort the individuals by their fitness and assign
+    them exponential skewed probabilities to be selected.
+    """
+    elite_population.sort(reverse=True)
+    beta = beta
+    index = int(math.log(random()) / math.log(1 - beta))
+    index = index % len(elite_population)
+    ind_1 = elite_population[index]
+
+    return ind_1
 
 
 # Set attributes for all operators to define linear or subtree representations.
