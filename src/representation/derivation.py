@@ -286,9 +286,18 @@ def pi_grow(tree, max_depth):
     queue = [[tree, ret_true(params['BNF_GRAMMAR'].non_terminals[
                                  tree.root]['recursive'])]]
 
+    # Botao Check queue and params['BNF_GRAMMAR']
+    """print('----PRINT INITIAL TREE IN QUEUE----')
+    print(queue[0][0].__dict__)"""
+
+    """print('----BNF GRAMMAR INSTANCE----')
+    for k, v in params['BNF_GRAMMAR'].__dict__.items():
+        print(k, ': ', v, '\n')"""
+
     # Initialise empty genome. With PI operators we can't use a depth-first
     # traversal of the tree to build the genome, we need to build it as we
     # encounter each node.
+
     genome = []
 
     while queue:
@@ -345,6 +354,12 @@ def pi_grow(tree, max_depth):
 
         # Insert codon into the genome.
         genome.append(codon)
+
+        # Botao track
+        """print('----NODE----')
+        print(node.__dict__)
+        print('----GENOME----')
+        print(genome)"""
             
         # Initialise empty list of children for current node.
         node.children = []

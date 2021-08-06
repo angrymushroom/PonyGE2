@@ -71,7 +71,7 @@ def set_param_imports():
 
     # For these ops we let the param equal the function itself.
     ops = {'operators': ['INITIALISATION', 'SELECTION', 'CROSSOVER',
-                         'MUTATION', 'REPLACEMENT'],
+                         'MUTATION', 'REPLACEMENT', 'CROSSOVER_SELECTION'],
            'utilities.fitness': ['ERROR_METRIC'],
            'fitness': ['FITNESS_FUNCTION'],
            'algorithm': ['SEARCH_LOOP', 'STEP']}

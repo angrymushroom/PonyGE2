@@ -22,9 +22,6 @@ def mane():
     # Run evolution
     individuals = params['SEARCH_LOOP']()
 
-    # Print individuals in commandline
-    print('-*10')
-    print('-*10')
     # Print final review
     get_stats(individuals, end=True)
 

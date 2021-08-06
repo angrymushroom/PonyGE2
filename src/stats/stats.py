@@ -36,6 +36,7 @@ stats = {
         "min_tree_nodes": 0,
         "ave_fitness": 0,
         "best_fitness": 0,
+        "best_test_fitness": 0,
         "time_taken": 0,
         "total_time": 0,
         "time_adjust": 0
@@ -93,11 +94,6 @@ def get_soo_stats(individuals, end):
         # Save best individual in trackers.best_ever.
         trackers.best_ever = best
 
-        # Botao
-        print('Best individual:')
-        print(trackers.best_ever)
-        print('Best individual updated')
-
     if end or params['VERBOSE'] or not params['DEBUG']:
         # Update all stats.
         update_stats(individuals, end)
@@ -121,7 +117,7 @@ def get_soo_stats(individuals, end):
         stdout.flush()
 
     # Generate test fitness on regression problems
-    if hasattr(params['FITNESS_FUNCTION'], "training_test") and end:
+    if hasattr(params['FITNESS_FUNCTION'], "training_test"):  # and end
 
         # Save training fitness.
         trackers.best_ever.training_fitness = copy(trackers.best_ever.fitness)
@@ -132,6 +128,9 @@ def get_soo_stats(individuals, end):
 
         # Set main fitness as training fitness.
         trackers.best_ever.fitness = trackers.best_ever.training_fitness
+
+        # Update testing fitness into stats dictionary
+        stats['best_test_fitness'] = trackers.best_ever.test_fitness
 
     # Save stats to list.
     if params['VERBOSE'] or (not params['DEBUG'] and not end):

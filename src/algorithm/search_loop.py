@@ -6,6 +6,7 @@ from utilities.stats import trackers
 from operators.initialisation import initialisation
 from utilities.algorithm.initialise_run import pool_init
 
+
 def search_loop():
     """
     This is a standard search process for an evolutionary algorithm. Loop over
@@ -33,17 +34,8 @@ def search_loop():
     for generation in range(1, (params['GENERATIONS']+1)):
         stats['gen'] = generation
 
-        # Botao
-        print('Generation ',generation, ' is generated')
-
         # New generation
-        # Call step.py
         individuals = params['STEP'](individuals)
-        print('\nGenome in individual:')
-        for i in individuals:
-            print('Individual:',i)
-            print('Genome:',i.genome)
-        print('Individuals are shown\n')
 
     if params['MULTICORE']:
         # Close the workers pool (otherwise they'll live on forever).

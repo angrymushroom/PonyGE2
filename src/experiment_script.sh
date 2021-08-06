@@ -1,0 +1,3 @@
+python experiment_manager.py --runs 30 --parameters classification_5clusters.txt --experiment_name crossover_elite_5clusters_Banknote
+python experiment_manager.py --runs 30 --parameters classification_7clusters.txt --experiment_name crossover_elite_7clusters_Banknote
+python experiment_manager.py --runs 30 --parameters classification_9clusters.txt --experiment_name crossover_elite_9clusters_Banknote

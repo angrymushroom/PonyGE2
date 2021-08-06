@@ -13,10 +13,8 @@ params = {
         'STEP': 'step',
 
         # Evolutionary Parameters
-        # 'POPULATION_SIZE': 500,
-        'POPULATION_SIZE': 10,
-        'GENERATIONS': 5,
-        # 'GENERATIONS': 50,
+        'POPULATION_SIZE': 500,
+        'GENERATIONS': 50,
         'HILL_CLIMBING_HISTORY': 1000,
         'SCHC_COUNT_METHOD': "count_all",
 
@@ -91,6 +89,13 @@ params = {
         'CROSSOVER_PROBABILITY': 0.75,
         # Prevents crossover from generating invalids.
         'NO_CROSSOVER_INVALIDS': False,
+        # Selection method in crossover
+        # Currently it does not support to specify this parameter via txt file
+        'CROSSOVER_SELECTION': "operators.crossover.crossover",
+        # Remove 20% of the worst individuals in the sub-population
+        'REMOVE': False,
+        # Set the number of clusters in crossover selection (only clustering is needed)
+        'CLUSTERS': 5,
 
         # MUTATION
         # Set mutation operator.
@@ -188,7 +193,10 @@ params = {
         
         # OTHER
         # Set machine name (useful for doing multiple runs)
-        'MACHINE': machine_name
+        'MACHINE': machine_name,
+
+        # Set the beta value for biased randomised selection
+        'BETA': 0.7
 }
 
 

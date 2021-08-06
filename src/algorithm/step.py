@@ -1,9 +1,10 @@
 from fitness.evaluation import evaluate_fitness
-from operators.crossover import crossover
+from operators.crossover import cs
 from operators.mutation import mutation
 from operators.replacement import replacement, steady_state
 from operators.selection import selection
 from stats.stats import get_stats
+
 
 def step(individuals):
     """
@@ -20,12 +21,9 @@ def step(individuals):
 
     # Select parents from the original population.
     parents = selection(individuals)
-    print('\nParents :')
-    print(*parents)
-    print('Parents are shown')
 
     # Crossover parents and add to the new population.
-    cross_pop = crossover(parents)
+    cross_pop = cs(parents)
 
     # Mutate the new population.
     new_pop = mutation(cross_pop)
