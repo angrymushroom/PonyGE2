@@ -36,7 +36,7 @@ def crossover(parents):
 
     # Initialise an empty population.
     cross_pop = []
-    
+
     while len(cross_pop) < params['GENERATION_SIZE']:
         
         # Randomly choose two parents from the parent population.
@@ -69,7 +69,21 @@ def crossover_between_clusters(parents):
     # Initialise an empty population.
     cross_pop = []
     # cluster the population into k clusters. set k in sub_population().
-    sub_list = sub_population(parents)  # cluster the population into k clusters. set k in sub_population
+    # sub_list = sub_population(parents)  # cluster the population into k clusters. set k in sub_population
+    sub_list = sub_population_genome_similarity(parents, params['CLUSTERS'])
+
+    total_individuals = 0
+    for i in sub_list:
+        total_individuals += len(i)
+
+    """print('NUMBER OF PARENTS:', len(parents))
+    print('NUMBER OF INDIVIDUALS IN SUB-POPULATION:', total_individuals)
+
+    print('----LENGTH OF SUB_LIST----', len(sub_list))
+    for i in range(len(sub_list)):
+        print('length of cluster %d is %d' % (i, len(sub_list[i])))"""
+
+    # print('EXAMPLE:\n', sub_list[0])
 
     # Remove 20% of the worst individuals in each sub-population
     if params['REMOVE']:
@@ -77,11 +91,19 @@ def crossover_between_clusters(parents):
             eliminate_bad_individual(i)
 
     while len(cross_pop) < params['GENERATION_SIZE']:
+        # If there are more than 2 cluster, randomly select two clusters to do the crossover
+        if len(sub_list) > 2:
+            cluster_list = sample(sub_list, 2)  # randomly select two clusters
+            # select one individual as a parent from each clusters
+            ind_1, ind_2 = sample(cluster_list[0], 1), sample(cluster_list[1], 1)
 
-        cluster_list = sample(sub_list, 2)  # randomly select two clusters
+        # If there is only one cluster left, it have to do the crossover within this cluster
+        elif len(sub_list) == 1:
+            ind_1, ind_2 = sample(sub_list[0], 1), sample(sub_list[0], 1)
 
-        # select one individual as a parent from each clusters
-        ind_1, ind_2 = sample(cluster_list[0], 1), sample(cluster_list[1], 1)
+        # If there are two clusters, only do the crossover between these two clusters
+        elif len(sub_list) == 2:
+            ind_1, ind_2 = sample(sub_list[0], 1), sample(sub_list[1], 1)
 
         # Perform crossover on chosen parents.
         inds_out = crossover_inds(ind_1[0], ind_2[0])
@@ -646,6 +668,50 @@ def sub_population(population):
         sub_list[cluster_index].append(i[0])
 
     return sub_list
+
+
+def sub_population_genome_similarity(population, n_clusters):
+    """
+    Cluster the individuals by different gene.
+
+    Randomly select n individuals as the centroids of n clusters. Then put the rest  individuals into the nearest
+    cluster. The distance between a individual and a cluster is defined as the number of the different genes between
+    the individual and the centroid individual of a cluster.
+
+    :param population: parents.
+    :param n_clusters: hyper-parameter. the number of clusters.
+    :return: a list contains n clusters of individuals.
+    """
+    centroids = sample(population, n_clusters)
+    sub_list = [[] for i in range(n_clusters)]
+
+    # put centroids into the sub_list
+    for i in range(len(centroids)):
+        sub_list[i].append(centroids[i])
+
+    for individual in population:
+        score_list = []
+        for centroid in centroids:
+            score = genome_similarity(centroid, individual)
+            score_list.append(score)
+        index_max = max(range(len(score_list)), key=score_list.__getitem__)
+        sub_list[index_max].append(individual)
+
+    # remove the sub-population if the population is too small
+    for i in sub_list[:]:
+        if len(i) < 5:
+            sub_list.remove(i)
+
+    return sub_list
+
+
+def genome_similarity(centroid, individual):
+    """
+    Calculate the genome distance between two individuals. The distance is defined as the number of different
+    genes of two individuals
+    """
+    score = set(centroid.genome).intersection(individual.genome)
+    return score
 
 
 def eliminate_bad_individual(population, eliminate_rate=.2):
