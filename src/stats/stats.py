@@ -11,6 +11,7 @@ from utilities.stats.save_plots import save_plot_from_data, \
     save_pareto_fitness_plot
 from utilities.stats.file_io import save_stats_to_file, save_stats_headers, \
     save_best_ind_to_file, save_first_front_to_file
+from scipy.stats import entropy
 
 
 """Algorithm statistics"""
@@ -39,7 +40,8 @@ stats = {
         "best_test_fitness": 0,
         "time_taken": 0,
         "total_time": 0,
-        "time_adjust": 0
+        "time_adjust": 0,
+        "entropy": 0
 }
 
 
@@ -331,11 +333,25 @@ def update_stats(individuals, end):
     stats['ave_tree_nodes'] = np.nanmean(nodes)
     stats['min_tree_nodes'] = np.nanmin(nodes)
 
+    #  Population Entropy
+    fitness = [i.fitness for i in individuals]
+    stats['entropy'] = compute_entropy(fitness)
+
     if not hasattr(params['FITNESS_FUNCTION'], 'multi_objective'):
         # Fitness Stats
         fitnesses = [i.fitness for i in individuals]
         stats['ave_fitness'] = np.nanmean(fitnesses, axis=0)
         stats['best_fitness'] = trackers.best_ever.fitness
+
+
+def compute_entropy(labels, base=None):
+    """
+    Given a list of fitness, compute the entropy.
+
+    :return: entropy.
+    """
+    value, counts = np.unique(labels, return_counts=True)
+    return entropy(counts, base=base)
 
 
 def print_generation_stats():
