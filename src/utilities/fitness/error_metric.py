@@ -129,3 +129,14 @@ def Hamming_error(y, yhat):
     """
     return np.sum(y != yhat)
 Hamming_error.maximise = False
+
+
+def huber(y, yhat):
+    """
+
+    """
+    delta = params['HUBER_ALPHA']  # 1, 10
+    loss = np.where(np.abs(y - yhat) < delta, 0.5 * ((y - yhat) ** 2),
+                    delta * np.abs(y - yhat) - 0.5 * (delta ** 2))
+    return np.sum(loss)
+huber.maximise = False
