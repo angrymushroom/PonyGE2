@@ -20,6 +20,24 @@ The PonyGE2 development team can be contacted via [GitHub](https://github.com/jm
 PonyGE2 is copyright (C) 2009-2017
 
 
+# New features by Botao and Tianyi
+--------------
+## Selection
+- BRP-tournament
+## Crossover
+- Inter-subpopulation Crossover
+- Intra-subpopulation Crossover
+- Elite-subpopulation Crossover
+- Genome Similarity Based Subpopulationn Crossover
+
+## Loss Function
+- The Huber Loss Function
+
+## Stats
+- Testing Fitness
+- Entropy
+
+
 # Requirements
 --------------
 
