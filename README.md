@@ -35,7 +35,7 @@ PonyGE2 is copyright (C) 2009-2017
 
 ## Stats
 - Testing Fitness
-- Entropy
+- Population Entropy
 
 
 # Requirements
